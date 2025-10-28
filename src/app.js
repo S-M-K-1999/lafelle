@@ -1,27 +1,40 @@
-const express = require('express');
-const cors = require('cors');
-const mongoose = require('mongoose');
-require('dotenv').config();
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
+import dotenv from "dotenv";
+import categoryRoutes from "./routes/category.routes.js";
+import authRoutes from "./routes/auth.routes.js";
+import productsRouter from "./routes/products.routes.js"; // ✅ updated import
+
+dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 5000;
 
+// Middleware
 app.use(cors());
 app.use(express.json());
 
+// MongoDB connection
 const uri = process.env.ATLAS_URI;
-mongoose.connect(uri)
-    .then(() => console.log("MongoDB database connection established successfully"))
-    .catch(err => console.error("MongoDB connection error:", err));
+mongoose
+  .connect(uri)
+  .then(() =>
+    console.log("✅ MongoDB database connection established successfully")
+  )
+  .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-// version
+// Version prefix
 const version_prefix = process.env.VERSION_PREFIX || "v1";
 
-// Import and use product routes
-const productsRouter = require('./routes/products');
+// Routes
+app.use(`/${version_prefix}/auth`, authRoutes);
+app.use(`/${version_prefix}/categories`, categoryRoutes);
 app.use(`/${version_prefix}/products`, productsRouter);
 
+// Start server
 app.listen(port, () => {
-    console.log(`Server is running on port: ${port}`);
+  console.log(`🚀 Server is running on port: ${port}`);
 });
-module.exports = app;
+
+export default app; // ✅ ESM export
