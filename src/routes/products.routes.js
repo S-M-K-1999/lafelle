@@ -72,14 +72,14 @@ router.post("/add", verifyToken, verifyAdmin, async (req, res) => {
 // Update product (with optional image re-upload)
 router.put("/update/:id", verifyToken, verifyAdmin, async (req, res) => {
   try {
-    const { name, description, price, category, base64Image, fileName } = req.body;
+    const { name, description, price, category, imageUrl } = req.body;
 
     let updatedFields = { name, description, price: Number(price), category };
 
     // If a new image is provided, upload it and replace old one
-    if (base64Image && fileName) {
+    if (imageUrl) {
       const imageKitService = new ImageKitService();
-      const uploadResult = await imageKitService.uploadBase64Image(base64Image, fileName);
+      const uploadResult = await imageKitService.uploadBase64Image(imageUrl, name);
 
       // Delete old image if available
       const oldProduct = await Product.findById(req.params.id);
